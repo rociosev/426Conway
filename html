@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Conway's game of life</title>
+<link rel="stylesheet" type="text/css" href="a2.css">
+ <script type="text/javascript" src="jquery-1.11.3.js"></script>
+ <script src="a2.js"></script>
+ 
+</head>
+
+<body>
+<h2> Welcome, let's play Conway's game of life </h2>
+<div id="controls">
+  <form id="control_form">
+ 
+    <button id="restart_button">Restart Game</button>
+    <br>
+    <p> Please enter your desired width, height and speed.</p>
+<input type=number value="width" id="width"/>
+<input type=number value="height" id="height"/>
+<input type=number value="percent" id="percent"/>
+<input type=button onclick="newTable(document.getElementById('width').width,document.getElementById('height').height,document.getElementById('percent').percent)"/> Make table
+  <br>
+  <input id="stop" type="button" value="stop" onclick="stopSimulation"/>
+   <input id="step" type="button" value="step" onclick="step"/>
+    <input id="play" type="button" value="play" onclick="startSimulation"/>
+  <br>
+  </form>
+  
+ 
+
+  
+</div>
+
+<div id="status_display">
+</div>
+
+<div id="table">
+</div>
+
+
+</body>
+</html>
+
