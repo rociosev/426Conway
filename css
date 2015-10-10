@@ -1,0 +1,17 @@
+#table table{
+	width: 400px;
+	height: 400px;
+	table-layout: fixed;
+	margin: auto;
+}
+#table table .alive{
+	background-color: green;
+	
+}
+
+#table table .dead{
+	background-color: black;
+}
+#table table .wasAlive{
+	border-color:blue;
+}
