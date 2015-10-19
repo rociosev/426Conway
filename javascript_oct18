@@ -1,0 +1,206 @@
+$
+var neighborRadius=1;
+var tableWidth;
+var tableHeight;
+var loneliness=2;
+var overpop=3;
+var gmin=3;
+var gmax=3;
+var interval;
+var speed=1000;
+var countType=1;
+var running = false;
+
+
+Number.prototype.mod = function(n) {
+    return ((this%n)+n)%n;
+};
+
+function setParameters(element){
+	neighborRadius = parseInt($(element).parent().find("#neighborRadius").val())
+	if(neighborRadius <1){
+		neighborRadius = 1;
+	}
+	else if(neighborRadius >10){
+		neighborRadius = 10;	
+	}
+	
+	gmax= parseInt($(element).parent().find("#gMax").val())
+	
+	if(gmax >=  4*neighborRadius*neighborRadius + 4*neighborRadius){
+		gmax =  ((4*neighborRadius*neighborRadius + 4*neighborRadius)-1) 
+	}
+	else if(gmax<0){
+		gmax = 1; 
+	}
+	
+	gmin= parseInt($(element).parent().find("#gMin").val())
+	if(gmin>gmax){
+		gmin = gmax;
+	} 
+	else if( gmin<0){
+		gmin =1;
+	}
+	overpop = parseInt($(element).parent().find("#overpopulation").val())
+	if (overpop >=   4*neighborRadius*neighborRadius + 4*neighborRadius)
+		overpop = ((4*neighborRadius*neighborRadius + 4*neighborRadius)-1)
+	
+	loneliness = parseInt($(element).parent().find("#loneliness").val())
+	if (loneliness<1) {
+		loneliness = 1;
+		}
+	else if((loneliness > overpop)){
+		loneliness = overpop;
+		}
+	speed = parseInt($(element).parent().find("#speed").val())
+	if(speed>1000){
+		speed = 1000;
+	}
+	else if(speed<0){
+		speed=0;
+	}
+	
+	$(element).parent().find("#neighborRadius").val(neighborRadius)
+	$(element).parent().find("#gMax").val(gmax)
+	$(element).parent().find("#gMin").val(gmin)
+	$(element).parent().find("#loneliness").val(loneliness)
+	$(element).parent().find("#overpop").val(overpop)
+	$(element).parent().find("#speed").val(speed)	
+}
+
+function startSimulation(){
+	interval=setInterval(step,speed)
+	running = true;
+}
+
+function stopSimulation(){
+	clearInterval(interval)
+	running = false;
+}
+
+function stepTwo(){
+	if(!running){
+		step();
+	}
+}
+
+function newTable(element){
+	$(element).parent().find("#width").val()
+	tableWidth=	$(element).parent().find("#width").val();
+	var percent = $(element).parent().find("#percent").val(); 
+	tableHeight= $(element).parent().find("#height").val()
+	var tableString="<table><tbody>";
+		for(i=0; i<tableHeight; i++){
+			tableString=tableString+"<tr index="+i+">";
+			for(w=0;w<tableWidth;w++){
+				if(Math.random()*100<percent){
+					tableString=tableString+'<td class="alive" index='+w+'></td>';	
+				}
+				else{
+					tableString=tableString+'<td class="dead" index='+w+'></td>';
+				}
+			}
+			tableString=tableString+"</tr>";
+		}
+	tableString=tableString+"</tbody></table>";
+	$('#table').html(tableString)
+	$('#table td').click(function(event){
+	if(event.shiftKey)
+			$(this).removeClass('dead').addClass('alive');
+	else if(event.altKey)
+		$(this).removeClass('alive').addClass('dead').addClass('wasAlive');
+		
+	else if($(this).hasClass("alive"))
+			$(this).removeClass('alive').addClass('dead').addClass('wasAlive');
+			
+	else
+			$(this).removeClass('dead').addClass('alive');
+		
+	})
+
+}
+
+function countAlive(x,y){
+	var count=0;
+	if(countType==1){ // outside DEAD
+		for(i=x-neighborRadius;i<=x+neighborRadius;i++){
+			for(j=y-neighborRadius;j<=y+neighborRadius;j++){
+				if($('#table table tr[index='+j+'] td[index='+i+']').hasClass("alive")){
+					if(i!=x || j!=y)
+					count++;
+					}
+				}
+			}
+		}
+	else if (countType==2){
+		for(i=x-neighborRadius;i<=x+neighborRadius;i++){
+			for(j=y-neighborRadius;j<=y+neighborRadius;j++){
+				if($('#table table tr[index='+j+'] td[index='+i+']').hasClass("alive") || i<0 || i>=tableWidth || j>=tableHeight || j<0){
+					if(i!=x || j!=y)
+					count++;
+					}
+				}
+			}
+	}
+	else{ //Wrap 
+		for(i=x-neighborRadius;i<=x+neighborRadius;i++){
+			for(j=y-neighborRadius;j<=y+neighborRadius;j++){
+				if($('#table table tr[index='+j.mod(tableHeight)+'] td[index='+i.mod(tableWidth)+']').hasClass("alive")){
+					if(i!=x || j!=y)
+					count++;
+					}
+				}
+			}
+	}
+	return count;
+}
+
+function step(){
+	for(a=0; a<tableWidth; a++){
+		for(b=0;b<tableHeight;b++){
+			var element=$('#table tr[index='+b+'] td[index='+a+']')
+			var isAlive=$(element).hasClass("alive");
+			var aliveNeighbors = countAlive(a,b);
+			if(isAlive && aliveNeighbors<loneliness)// checks if the current one is alive and if there are two neighbors dead
+				$(element).addClass("toDie");
+			if(isAlive && aliveNeighbors>overpop)// checks if the current one is alive and if there are two neighbors dead
+				$(element).addClass("toDie");
+			if(!isAlive && aliveNeighbors>=gmin && aliveNeighbors<=gmax )// checks if the current one is alive and if there are two neighbors dead
+				$(element).addClass("toLive");
+		}
+	}
+	$('.toDie').removeClass('alive').removeClass('toDie').addClass('dead').addClass('wasAlive');
+	$('.toLive').removeClass('dead').removeClass('toLive').addClass('alive');
+}
+function createTable2(percent){
+	percent=0;
+	var tableString="<table><tbody>";
+		for(i=0; i<tableHeight; i++){
+			tableString=tableString+"<tr index="+i+">";
+			for(w=0;w<tableWidth;w++){
+				if(Math.random()*100<percent){
+					tableString=tableString+'<td class="alive" index='+w+'></td>';
+				}
+				else{
+					tableString=tableString+'<td class="dead" index='+w+'></td>';
+				}
+			}
+			tableString=tableString+"</tr>";
+		}
+		
+	tableString=tableString+"</tbody></table>";s
+		$('#table').html(tableString)
+		$('#table td').click(function(event){
+	if(event.shiftKey)
+			$(this).removeClass('dead').addClass('alive');
+	else if(event.altKey)
+		$(this).removeClass('alive').addClass('dead').addClass('wasAlive');
+		
+	else if($(this).hasClass("alive"))
+			$(this).removeClass('alive').addClass('dead').addClass('wasAlive');
+			
+	else
+			$(this).removeClass('dead').addClass('alive');
+		
+	})
+}
