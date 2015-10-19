@@ -59,7 +59,7 @@ function setParameters(element){
 	else if(speed<0){
 		speed=0;
 	}
-	
+	countType=parseInt($(element).parent().find("#countType option:selected").val())
 	$(element).parent().find("#neighborRadius").val(neighborRadius)
 	$(element).parent().find("#gMax").val(gmax)
 	$(element).parent().find("#gMin").val(gmin)
@@ -76,6 +76,7 @@ function startSimulation(){
 function stopSimulation(){
 	clearInterval(interval)
 	running = false;
+
 }
 
 function stepTwo(){
@@ -86,9 +87,9 @@ function stepTwo(){
 
 function newTable(element){
 	$(element).parent().find("#width").val()
-	tableWidth=	$(element).parent().find("#width").val();
-	var percent = $(element).parent().find("#percent").val(); 
-	tableHeight= $(element).parent().find("#height").val()
+	tableWidth=	parseInt($(element).parent().find("#width").val());
+	var percent = parseInt($(element).parent().find("#percent").val()); 
+	tableHeight= parseInt($(element).parent().find("#height").val());
 	var tableString="<table><tbody>";
 		for(i=0; i<tableHeight; i++){
 			tableString=tableString+"<tr index="+i+">";
@@ -188,7 +189,7 @@ function createTable2(percent){
 			tableString=tableString+"</tr>";
 		}
 		
-	tableString=tableString+"</tbody></table>";s
+	tableString=tableString+"</tbody></table>";
 		$('#table').html(tableString)
 		$('#table td').click(function(event){
 	if(event.shiftKey)
